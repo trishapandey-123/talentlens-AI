@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentLens AI — Autonomous Technical Hiring Suite</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PDF.js library browser parsing ke liye -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .pulse-ring {
+      animation: pulse-border 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+    @keyframes pulse-border {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- ==================== SCREEN 1: LOGIN PORTAL ==================== -->
+  <section id="screen-1" class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+    <header class="flex items-center justify-between max-w-6xl w-full mx-auto py-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+          <i data-lucide="cpu" class="w-6 h-6"></i>
+        </div>
+        <span class="text-2xl font-extrabold tracking-tight text-slate-900">TalentLens <span class="text-sky-600">AI</span></span>
+      </div>
+      <span class="text-xs font-semibold px-3 py-1.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-full flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Evaluation Engine v2.5
+      </span>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center py-6">
+      <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+        <div class="p-8 md:p-12 md:col-span-7 flex flex-col justify-center">
+          <div class="mb-6">
+            <span class="text-xs font-bold text-sky-600 tracking-wider uppercase">Enterprise Access</span>
+            <h2 class="text-2xl font-extrabold text-slate-800 mt-1">Select Login Access Role</h2>
+            <p class="text-xs text-slate-500 mt-1">Choose role to launch respective workflows.</p>
+          </div>
+
+          <!-- Role Toggle -->
+          <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-6">
+            <button type="button" id="role-btn-recruiter" onclick="switchLoginRole('recruiter')" class="py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-white text-sky-600 shadow-sm">
+              <i data-lucide="briefcase" class="w-4 h-4"></i> Recruiter Portal
+            </button>
+            <button type="button" id="role-btn-candidate" onclick="switchLoginRole('candidate')" class="py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800">
+              <i data-lucide="user" class="w-4 h-4"></i> Candidate Portal
+            </button>
+          </div>
+
+          <form id="login-form" class="space-y-4" onsubmit="handleAuthSubmit(event)">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1" id="email-label">Recruiter Official Email</label>
+              <div class="relative">
+                <i data-lucide="mail" class="w-4 h-4 absolute left-4 top-3 text-slate-400"></i>
+                <input type="email" id="login-email" value="recruiter@talentlens.ai" class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-sky-500 text-xs text-slate-700 font-medium" required />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Passkey / Token</label>
+              <div class="relative">
+                <i data-lucide="lock" class="w-4 h-4 absolute left-4 top-3 text-slate-400"></i>
+                <input type="password" id="login-password" value="••••••••" class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-sky-500 text-xs text-slate-700 font-medium" required />
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 flex items-center gap-2" id="role-hint-banner">
+              <i data-lucide="info" class="w-4 h-4 text-sky-600 shrink-0"></i>
+              <span>Recruiter Workflow: Post Job, Upload Candidate Resume, Auto Screening &amp; Question Generation.</span>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold text-xs shadow-lg shadow-sky-600/20 transition-all flex items-center justify-center gap-2">
+              <span id="login-submit-text">Log In as Recruiter</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+
+        <div class="hidden md:flex md:col-span-5 bg-gradient-to-br from-slate-900 to-sky-950 p-8 flex-col justify-between text-white relative">
+          <div>
+            <span class="text-[10px] tracking-widest uppercase px-2.5 py-1 bg-white/10 rounded-full font-bold">Autonomous Probing</span>
+            <h3 class="text-xl font-bold mt-4 leading-snug">Instant Resume Screening with Real Dynamic Questions.</h3>
+          </div>
+          <div class="space-y-3 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> <span>Automated PDF Parsing in Browser</span></div>
+            <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> <span>Semantic Gap-Aware Questioning</span></div>
+            <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> <span>Real Audio Proctored Voice Assessment</span></div>
+          </div>
+          <p class="text-[11px] text-slate-400">VITS Satna &bull; B.Tech CSE Project</p>
+        </div>
+      </div>
+    </main>
+    <footer class="text-center text-xs text-slate-400 py-3">&copy; 2026 TalentLens AI &bull; Session 2026-2027</footer>
+  </section>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <div id="app-container" class="hidden min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between p-5 shrink-0 border-r border-slate-800 shadow-2xl">
+      <div class="space-y-6">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black text-base shadow-md">TL</div>
+          <div>
+            <h1 class="font-extrabold text-sm tracking-wide text-white">TalentLens AI</h1>
+            <span class="text-[10px] text-sky-400 font-semibold block" id="sidebar-role-badge">Recruiter Portal</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60 flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center font-bold text-white text-sm shrink-0" id="user-avatar-initials">RC</div>
+          <div class="overflow-hidden">
+            <h4 class="font-bold text-xs text-slate-100 truncate" id="user-display-name">Tech Hiring Manager</h4>
+            <p class="text-[10px] text-slate-400 truncate" id="user-display-sub">Enterprise Screening</p>
+          </div>
+        </div>
+
+        <!-- RECRUITER NAV -->
+        <nav id="nav-recruiter-group" class="space-y-1">
+          <button onclick="navigateToScreen('screen-job-post')" id="nav-btn-screen-job-post" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="file-plus" class="w-4 h-4 text-sky-400"></i> 1. Post Job &amp; Upload PDF
+          </button>
+          <button onclick="navigateToScreen('screen-recruiter-ats')" id="nav-btn-screen-recruiter-ats" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="check-square" class="w-4 h-4 text-indigo-400"></i> 2. ATS Screening Results
+          </button>
+          <button onclick="navigateToScreen('screen-recruiter-interview')" id="nav-btn-screen-recruiter-interview" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="mic" class="w-4 h-4 text-emerald-400"></i> 3. Voice Mock Probing
+          </button>
+          <button onclick="navigateToScreen('screen-recruiter-report')" id="nav-btn-screen-recruiter-report" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="award" class="w-4 h-4 text-purple-400"></i> 4. Final Scorecard
+          </button>
+        </nav>
+
+        <!-- CANDIDATE NAV -->
+        <nav id="nav-candidate-group" class="space-y-1 hidden">
+          <button onclick="navigateToScreen('screen-candidate-upload')" id="nav-btn-screen-candidate-upload" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="file-up" class="w-4 h-4 text-sky-400"></i> 1. Upload Resume (PDF)
+          </button>
+          <button onclick="navigateToScreen('screen-candidate-analysis')" id="nav-btn-screen-candidate-analysis" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-red-400"></i> 2. Weakness &amp; Gap Analysis
+          </button>
+          <button onclick="navigateToScreen('screen-candidate-training')" id="nav-btn-screen-candidate-training" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition text-left text-slate-300">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-400"></i> 3. Training &amp; Upskilling
+          </button>
+        </nav>
+      </div>
+
+      <button onclick="navigateToScreen('screen-1')" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition mt-6">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Switch Role / Logout
+      </button>
+    </aside>
+
+    <!-- Main Screens -->
+    <main class="flex-1 bg-slate-50 min-h-screen p-6 md:p-10 overflow-y-auto">
+
+      <!-- ==================== RECRUITER SCREEN 1: POST JOB & UPLOAD CANDIDATE PDF ==================== -->
+      <section id="screen-job-post" class="app-screen space-y-6 max-w-5xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Recruiter Flow &bull; Step 01</span>
+            <h2 class="text-2xl font-black text-slate-900">Define Job &amp; Upload Candidate Resume</h2>
+          </div>
+          <button onclick="processRecruiterResume()" id="screen-btn-action" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+            <span>Screen &amp; Generate Questions</span>
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Job Role Title</label>
+              <input type="text" id="rec-jd-title" value="Full Stack & Distributed Systems Engineer" class="w-full p-3 border border-slate-200 rounded-xl text-xs text-slate-800 font-semibold focus:border-sky-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Required Skills (Comma separated keywords)</label>
+              <input type="text" id="rec-jd-skills" value="Python, FastAPI, Redis, WebSockets, React, Docker" class="w-full p-3 border border-slate-200 rounded-xl text-xs text-slate-800 font-semibold focus:border-sky-500 outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Job Description Context</label>
+            <textarea id="rec-jd-desc" rows="3" class="w-full p-3 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-sky-500 leading-relaxed">Designing high throughput real-time APIs, distributed Redis caching, WebSocket connections, and fault-tolerant cloud microservices.</textarea>
+          </div>
+
+          <!-- RECRUITER RESUME PDF UPLOADER BOX -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Candidate Resume (PDF Document)</label>
+            <div class="border-2 border-dashed border-sky-300 rounded-2xl p-8 text-center hover:border-sky-500 transition relative bg-sky-50/20">
+              <input type="file" id="rec-pdf-file-input" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="handleRecruiterFileSelect(event)" />
+              <div class="pointer-events-none space-y-2">
+                <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
+                  <i data-lucide="file-up" class="w-6 h-6"></i>
+                </div>
+                <p class="text-xs font-bold text-slate-800" id="rec-upload-label">Drag &amp; Drop Candidate Resume PDF or Click to Browse</p>
+                <p class="text-[11px] text-slate-400">PDF will be parsed instantly to extract skills and projects</p>
+              </div>
+            </div>
+            <!-- Progress Bar -->
+            <div id="rec-upload-progress" class="hidden mt-3 max-w-md mx-auto">
+              <div class="flex justify-between text-xs font-bold text-sky-700 mb-1">
+                <span id="rec-progress-text">Extracting text &amp; matching JD keywords...</span>
+                <span id="rec-progress-val">0%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div id="rec-progress-fill" class="bg-sky-600 h-2 rounded-full w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== RECRUITER SCREEN 2: ATS RESULTS ==================== -->
+      <section id="screen-recruiter-ats" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Recruiter Flow &bull; Step 02</span>
+            <h2 class="text-2xl font-black text-slate-900">ATS Screening &amp; Extracted Skill Matrix</h2>
+          </div>
+          <button onclick="navigateToScreen('screen-recruiter-interview')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+            Proceed to Voice Interview <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center flex flex-col justify-center items-center">
+            <span class="text-xs font-bold uppercase text-slate-400">Calculated ATS Score</span>
+            <div class="text-5xl font-black text-emerald-600 my-3" id="rec-ats-score">--%</div>
+            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold" id="rec-ats-badge">Verified Fit</span>
+            <p class="text-[11px] text-slate-500 mt-3" id="rec-resume-filename-display">No file parsed yet.</p>
+          </div>
+
+          <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h4 class="text-xs font-bold uppercase text-slate-500">Skills Extracted Directly From Resume</h4>
+            <div class="space-y-3" id="rec-skills-bars-container">
+              <!-- Dynamically populated skills -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== RECRUITER SCREEN 3: VOICE INTERVIEW PROBING ==================== -->
+      <section id="screen-recruiter-interview" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Recruiter Flow &bull; Step 03</span>
+            <h2 class="text-2xl font-black text-slate-900">AI Proctored Technical Voice Interview</h2>
+          </div>
+          <span class="px-3 py-1 bg-red-50 text-red-600 border border-red-200 rounded-full text-xs font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span> Audio Proctored
+          </span>
+        </div>
+
+        <div class="bg-white p-7 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+          <!-- Dynamically Generated Main Question -->
+          <div class="bg-slate-900 text-white p-5 rounded-2xl space-y-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400">Dynamic Technical Question (Generated from your Resume)</span>
+            <h3 class="text-base font-bold leading-relaxed" id="rec-interview-question">
+              "How would you design a real-time WebSocket cluster with Redis Pub/Sub to prevent message drops during high concurrency?"
+            </h3>
+          </div>
+
+          <!-- Real Audio Recording Unit -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3">
+            <button id="rec-record-btn" onclick="toggleAudioRecording()" class="w-16 h-16 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg shadow-red-500/30 transition transform active:scale-95 mx-auto">
+              <i data-lucide="mic" id="rec-record-icon" class="w-7 h-7"></i>
+            </button>
+            <p class="text-xs font-bold text-slate-700" id="rec-recording-status">Tap microphone to record your verbal solution</p>
+            <p class="text-xs text-slate-400 font-mono" id="rec-recording-timer">00:00</p>
+            <div id="rec-audio-playback-container" class="hidden pt-2 max-w-md mx-auto">
+              <span class="text-[11px] font-bold text-slate-600 block mb-1">Playback Recorded Audio:</span>
+              <audio id="rec-audio-playback" controls class="w-full rounded-lg"></audio>
+            </div>
+          </div>
+
+          <!-- AI Contextual Follow-Up Question -->
+          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+            <i data-lucide="bot" class="w-5 h-5 text-amber-600 mt-1 shrink-0"></i>
+            <div>
+              <span class="text-xs font-bold text-amber-900 block">AI Contextual Follow-up (Gap-Targeted):</span>
+              <p class="text-xs text-amber-800 mt-0.5 font-medium" id="rec-interview-probing">
+                "Under Redis Pub/Sub, messages are fire-and-forget. What persistence mechanism will you implement so offline users don't miss notifications?"
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button onclick="navigateToScreen('screen-recruiter-report')" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+              Generate Final Scorecard <i data-lucide="award" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== RECRUITER SCREEN 4: FINAL SCORECARD ==================== -->
+      <section id="screen-recruiter-report" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-600">Recruiter Flow &bull; Step 04</span>
+            <h2 class="text-2xl font-black text-slate-900">Holistic Candidate Evaluation Scorecard</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-4 py-2 bg-emerald-100 text-emerald-800 font-black text-sm rounded-xl" id="rec-report-final-score">85% &bull; Qualified</span>
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl flex items-center gap-1.5"><i data-lucide="printer" class="w-4 h-4"></i> Print PDF</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <tr><th class="py-3 px-6">Evaluation Domain</th><th class="py-3 px-6">Rating</th><th class="py-3 px-6">AI Evaluation Key Remark</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr><td class="py-4 px-6 font-bold">Resume Semantic Fit</td><td class="py-4 px-6 text-amber-500 font-bold">★★★★☆</td><td class="py-4 px-6" id="report-resume-remark">Parsed valid technical projects matching the core JD requirements.</td></tr>
+              <tr><td class="py-4 px-6 font-bold">System Architecture</td><td class="py-4 px-6 text-amber-500 font-bold">★★★★☆</td><td class="py-4 px-6">Demonstrated clarity on decoupling WebSocket gateways and async queuing.</td></tr>
+              <tr><td class="py-4 px-6 font-bold">Dynamic Probing Adherence</td><td class="py-4 px-6 text-emerald-600 font-bold">★★★★★</td><td class="py-4 px-6">Addressed edge cases and missing components directly upon follow-up.</td></tr>
+              <tr><td class="py-4 px-6 font-bold">Voice Proctored Integrity</td><td class="py-4 px-6 text-emerald-600 font-bold">★★★★★</td><td class="py-4 px-6">Verified continuous audio response stream without unnatural pauses.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==================== CANDIDATE FLOW SCREENS ==================== -->
+      <section id="screen-candidate-upload" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+          <h2 class="text-2xl font-black text-slate-900">Candidate Diagnostic Upload</h2>
+          <button onclick="navigateToScreen('screen-candidate-analysis')" class="px-5 py-2.5 bg-sky-600 text-white font-bold text-xs rounded-xl">View Gap Diagnostics &rarr;</button>
+        </div>
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center">
+          <i data-lucide="file-check" class="w-10 h-10 text-sky-600 mx-auto mb-2"></i>
+          <p class="text-sm font-bold text-slate-800">Your profile is synchronized for learning.</p>
+        </div>
+      </section>
+
+      <section id="screen-candidate-analysis" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+          <h2 class="text-2xl font-black text-slate-900">Identified Skill Gaps &amp; Weak Areas</h2>
+          <button onclick="navigateToScreen('screen-candidate-training')" class="px-5 py-2.5 bg-amber-600 text-white font-bold text-xs rounded-xl">Open Upskilling Labs &rarr;</button>
+        </div>
+        <div class="bg-red-50 border border-red-200 p-6 rounded-2xl">
+          <h4 class="font-bold text-red-900 text-sm">Key Weak Area: Redis Message Guarantees</h4>
+          <p class="text-xs text-red-700 mt-1">Lacked depth on message ack timeouts and handling persistent queues during connection drops.</p>
+        </div>
+      </section>
+
+      <section id="screen-candidate-training" class="app-screen space-y-6 max-w-5xl mx-auto hidden">
+        <div class="flex items-center justify-between pb-5 border-b border-slate-200">
+          <h2 class="text-2xl font-black text-slate-900">Targeted Remediation &amp; Training</h2>
+          <button onclick="navigateToScreen('screen-candidate-upload')" class="px-5 py-2.5 bg-slate-800 text-white font-bold text-xs rounded-xl">Re-Analyze</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200">
+            <h4 class="font-bold text-sm">Redis Streams vs Pub/Sub</h4>
+            <p class="text-xs text-slate-500 mt-1">Deep-dive into zero message loss patterns.</p>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200">
+            <h4 class="font-bold text-sm">STAR Structure Masterclass</h4>
+            <p class="text-xs text-slate-500 mt-1">Framing architectural trade-offs systematically.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
